@@ -6,6 +6,8 @@
     <title>Autoplay Video with Sound</title>
     <script>
         var player;
+        var triedUnmuted = false;
+
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('video', {
                 events: {
@@ -13,17 +15,30 @@
                 }
             });
         }
+
         function onPlayerReady(event) {
-            // Attempt to play video with sound after a slight delay
+            // Attempt to play video with sound
             setTimeout(function() {
                 player.unMute();
                 player.playVideo();
-            }, 500); // 0.5 second delay to simulate user gesture
+                triedUnmuted = true;
+            }, 500); // Slight delay to simulate user interaction
+
+            // Check after 1 second if the video is playing
+            setTimeout(checkPlaybackStatus, 1000);
 
             // Redirect after 6 seconds
             setTimeout(function() {
                 window.location.href = "https://register.rockthevote.com/";
-            }, 6000); // 6 seconds delay
+            }, 6000);
+        }
+
+        function checkPlaybackStatus() {
+            // If the video is not playing and we tried unmuted, play it muted
+            if (player.getPlayerState() !== YT.PlayerState.PLAYING && triedUnmuted) {
+                player.mute();
+                player.playVideo();
+            }
         }
     </script>
 </head>
@@ -34,4 +49,5 @@
     <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
 
